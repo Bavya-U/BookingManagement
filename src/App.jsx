@@ -18,18 +18,16 @@ import AdminSlotManagement from "./pages/admin/adminSlotManagement";
 import AdminServiceManagement from "./pages/admin/adminServiceManagement";
 import AdminAllBookings from "./pages/admin/allBooking";
 import { Loader } from "./components/loader";
-import PrivateRoute from "./components/PrivateRoute";
+import PrivateRoute from "./Route";
 
 function App() {
   return (
     <Router>
       <Loader />
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<Signup />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Resident Dashboard - Protected */}
         <Route
           path="/resident-dashboard"
           element={
@@ -47,7 +45,6 @@ function App() {
           />
         </Route>
 
-        {/* Admin Dashboard - Protected */}
         <Route
           path="/admin-dashboard"
           element={
