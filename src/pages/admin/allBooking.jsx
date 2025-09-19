@@ -1,28 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../../firebase";
-import { collection, getDocs, doc, getDoc, deleteDoc } from "firebase/firestore";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBookings, cancelBooking } from "../../redux/actions/allBookingAction";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableHeader,
-  TableHead,
-  TableRow,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { toast } from "react-toastify";
 import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
+import { toast } from "react-toastify";
 
 const AdminAllBookings = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { list: bookings, loading } = useSelector((state) => state.booking);
 
   const [search, setSearch] = useState("");
   const [sortColumn, setSortColumn] = useState("date");
@@ -30,90 +18,44 @@ const AdminAllBookings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
-  // ✅ Fetch bookings with service name
   useEffect(() => {
-    const fetchBookings = async () => {
-      setLoading(true);
-      try {
-        const snap = await getDocs(collection(db, "bookings"));
+    dispatch(fetchBookings());
+  }, [dispatch]);
 
-        const data = await Promise.all(
-          snap.docs.map(async (d) => {
-            const booking = { id: d.id, ...d.data() };
-            if (booking.service_id) {
-              const serviceRef = doc(db, "services", booking.service_id);
-              const serviceSnap = await getDoc(serviceRef);
-              if (serviceSnap.exists())
-                booking.serviceName = serviceSnap.data().name;
-            }
-            return booking;
-          })
-        );
-
-        setBookings(data);
-      } catch (err) {
-        console.error("Error fetching bookings:", err);
-        toast.error("Failed to fetch bookings");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBookings();
-  }, []);
-
-  const cancelBooking = async (id) => {
-    if (!window.confirm("Cancel this booking?")) return;
-    try {
-      await deleteDoc(doc(db, "bookings", id));
-      setBookings((prev) => prev.filter((b) => b.id !== id));
+  const handleCancel = (id) => {
+    if (window.confirm("Cancel this booking?")) {
+      dispatch(cancelBooking(id));
       toast.success("Booking cancelled successfully");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to cancel booking");
     }
   };
 
-  // ✅ Filter bookings
+  // Filter, sort, paginate (same as your previous logic)
   const filteredBookings = bookings.filter(
     (b) =>
-      (b.customerName || "")
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
+      (b.customerName || "").toLowerCase().includes(search.toLowerCase()) ||
       (b.email || "").toLowerCase().includes(search.toLowerCase()) ||
-      (b.serviceName || b.service_id || "")
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
+      (b.serviceName || "").toLowerCase().includes(search.toLowerCase()) ||
       (b.date || "").toLowerCase().includes(search.toLowerCase()) ||
       (b.slot || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ Sort bookings dynamically
   const sortedBookings = [...filteredBookings].sort((a, b) => {
     let valA = a[sortColumn] || "";
     let valB = b[sortColumn] || "";
-
-    // Date handling
     if (sortColumn === "date") {
       valA = new Date(valA);
       valB = new Date(valB);
     }
-
     if (typeof valA === "string") valA = valA.toLowerCase();
     if (typeof valB === "string") valB = valB.toLowerCase();
-
     if (valA < valB) return sortOrder === "asc" ? -1 : 1;
     if (valA > valB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
 
-  // ✅ Pagination
   const totalPages = Math.ceil(sortedBookings.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentBookings = sortedBookings.slice(
-    startIndex,
-    startIndex + rowsPerPage
-  );
+  const currentBookings = sortedBookings.slice(startIndex, startIndex + rowsPerPage);
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -123,13 +65,6 @@ const AdminAllBookings = () => {
       setSortOrder("asc");
     }
   };
-
-  if (loading)
-    return (
-      <p className="text-center py-8 text-gray-500 animate-pulse">
-        Loading bookings...
-      </p>
-    );
 
   return (
     <div className="max-w-6xl mx-auto p-4">
@@ -216,7 +151,7 @@ const AdminAllBookings = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          className="rounded-lg shadow-sm hover:scale-105 transition"
+                          className="rounded shadow-sm hover:scale-105 transition"
                           onClick={() => cancelBooking(b.id)}
                         >
                           Cancel

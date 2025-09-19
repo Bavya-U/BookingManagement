@@ -19,7 +19,7 @@ export const fetchServices = () => async (dispatch) => {
     dispatch({ type: FETCH_SERVICES_SUCCESS, payload: services });
   } catch (error) {
     dispatch({ type: FETCH_SERVICES_FAIL, payload: error.message });
-    toast.error("Failed to fetch services"); // React-toastify error
+    toast.error("Failed to fetch services");
   }
 };
 

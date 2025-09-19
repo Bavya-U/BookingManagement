@@ -195,7 +195,7 @@ const ResidentMyBookings = () => {
                           <Button
                             variant="destructive"
                             size="sm"
-                            className="rounded-lg shadow-sm hover:scale-105 transition"
+                            className="rounded shadow-sm hover:scale-105 transition"
                             onClick={() => handleCancel(b.id)}
                           >
                             Cancel

@@ -39,10 +39,10 @@ const Signup = () => {
   };
 
   const validationSchema = Yup.object({
-    email: Yup.string().email("Invalid email").required("Email is required"),
+    email: Yup.string().email("Invalid email").required("Required"),
     password: Yup.string()
       .min(6, "Minimum 6 characters")
-      .required("Password is required"),
+      .required("Required"),
     role: Yup.string().required("Please select a role"),
   });
 
@@ -99,7 +99,7 @@ const Signup = () => {
                     <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         type="button"
-                        className={`flex-1 ${
+                        className={`flex-1 rounded ${
                           values.role === "Admin"
                             ? "bg-[#2798b5] text-white hover:bg-[#2798b5] focus:bg-[#2798b5] active:bg-[#2798b5]"
                             : "bg-white border border-gray-300 text-black hover:bg-gray-100 focus:bg-white active:bg-white"
@@ -111,7 +111,7 @@ const Signup = () => {
 
                       <Button
                         type="button"
-                        className={`flex-1 ${
+                        className={`flex-1 rounded ${
                           values.role === "Resident"
                             ? "bg-[#2798b5] text-white hover:bg-[#2798b5] focus:bg-[#2798b5] active:bg-[#2798b5]"
                             : "bg-white border border-gray-300 text-black hover:bg-gray-100 focus:bg-white active:bg-white"
@@ -130,7 +130,7 @@ const Signup = () => {
 
                   {/* Email */}
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
                     <Field
                       as={Input}
                       type="email"
@@ -150,7 +150,7 @@ const Signup = () => {
 
                   {/* Password */}
                   <div>
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">Password <span className="text-red-500">*</span></Label>
                     <div className="relative">
                       <Field
                         as={Input}
@@ -168,7 +168,7 @@ const Signup = () => {
                         className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <FaEye /> : <FaEyeSlash />}
+                        {showPassword ?<FaEyeSlash />  : <FaEye />}
                       </span>
                     </div>
                     <ErrorMessage
@@ -181,7 +181,7 @@ const Signup = () => {
                   {/* Submit */}
                   <Button
                     type="submit"
-                    className="w-full bg-[#2798b5] hover:bg-[#1f7a91] text-white"
+                    className="w-full bg-[#2798b5] rounded hover:bg-[#35a7c7] text-white hover:scale-105 transition"
                     disabled={loading}
                   >
                     {loading ? "Signing up..." : "Signup"}

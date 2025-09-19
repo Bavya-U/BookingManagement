@@ -68,9 +68,9 @@ const AdminSlotManagement = () => {
   useEffect(() => setPage(1), [search]);
 
   const validationSchema = Yup.object({
-    service: Yup.string().required("Service is required"),
-    date: Yup.date().required("Date is required").nullable(),
-    slot: Yup.string().required("Slot is required"),
+    service: Yup.string().required("Required"),
+    date: Yup.date().required("Required").nullable(),
+    slot: Yup.string().required("Required"),
   });
 
   const handleSubmit = (values, { resetForm }) => {
@@ -111,9 +111,9 @@ const AdminSlotManagement = () => {
     <div className="max-w-6xl mx-auto p-4 space-y-6">
 
       {/* FORM CARD */}
-      <Card className="shadow-lg">
+      <Card className="shadow-md">
         <CardHeader>
-          <CardTitle>Add New Slot</CardTitle>
+          <CardTitle className="text-xl font-semibold">Service Management</CardTitle>
         </CardHeader>
         <CardContent>
           <Formik
@@ -134,40 +134,42 @@ const AdminSlotManagement = () => {
 
                     {/* Service */}
                     <div className="flex-1 flex flex-col w-full">
-                      <label>Service</label>
-                      <Field name="service">
-                        {({ field, form }) => (
-                          <Select
-                            value={field.value}
-                            onValueChange={val => {
-                              form.setFieldValue("service", val);
-                              form.setFieldTouched("service", true);
-                            }}
-                          >
-                            <SelectTrigger className="w-full h-10">
-                              <SelectValue placeholder="Select Service" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {services.map(s => (
-                                <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </Field>
-                      <div className="h-5 text-red-500 text-sm">
-                        <ErrorMessage name="service" />
-                      </div>
-                    </div>
+  <label>Service <span className="text-red-500">*</span></label>
+  <Field name="service">
+    {({ field, form }) => (
+      <Select
+        value={field.value || undefined}   // 🔑 empty string handle
+        onValueChange={(val) => {
+          form.setFieldValue("service", val);
+        }}
+      >
+        <SelectTrigger className="w-full h-10 rounded px-3">
+          <SelectValue placeholder="Select Service" />
+        </SelectTrigger>
+        <SelectContent>
+          {services.map((s) => (
+            <SelectItem key={s.id} value={s.id}>
+              {s.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    )}
+  </Field>
+  <div className="h-5 text-red-500 text-sm">
+    <ErrorMessage name="service" />
+  </div>
+</div>
+
 
                     {/* Date */}
                     <div className="flex-1 flex flex-col w-full">
-                      <label>Date</label>
+                      <label>Date <span className="text-red-500">*</span></label>
                       <Field name="date">
                         {({ field, form }) => (
                           <Popover>
                             <PopoverTrigger asChild>
-                              <Button variant="outline" className="w-full h-10 justify-start text-left">
+                              <Button variant="outline" className="w-full rounded h-10 justify-start text-left">
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value ? format(field.value, "PPP") : "Pick a date"}
                               </Button>
@@ -193,7 +195,7 @@ const AdminSlotManagement = () => {
 
                     {/* Slot */}
                     <div className="flex-1 flex flex-col w-full">
-                      <label>Slot</label>
+                      <label>Slot <span className="text-red-500">*</span></label>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <Field name="startTime">
                           {({ field, form }) => (
@@ -238,7 +240,7 @@ const AdminSlotManagement = () => {
 
                   {/* Submit Button */}
                   <div className="flex justify-end w-full md:w-auto">
-                    <Button type="submit" className="w-full md:w-auto px-4 mt-2">
+                    <Button type="submit" className="w-full md:w-auto px-4 mt-2 bg-[#2798b5] rounded hover:bg-[#35a7c7] text-white hover:scale-105 transition">
                       Add Slot
                     </Button>
                   </div>
@@ -250,77 +252,104 @@ const AdminSlotManagement = () => {
       </Card>
 
       {/* TABLE CARD */}
-      <Card className="shadow-lg">
-        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-          <CardTitle>Existing Slots</CardTitle>
-          <Input
-            placeholder="Search slots..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="max-w-xs"
-          />
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
+     <Card className="shadow-md">
+  <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+    <CardTitle>Existing Slots</CardTitle>
+    <Input
+      placeholder="Search slots..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="max-w-xs"
+    />
+  </CardHeader>
+  <CardContent className="overflow-x-auto">
+    <div className="w-full border border-gray-200 rounded-lg shadow-md overflow-hidden">
+      <Table className="min-w-[600px]">
+        {/* Always show header */}
+        <TableHeader className="bg-[#1f7a91] text-white">
+          <TableRow>
+            <TableHead
+              className="text-center cursor-pointer text-white font-semibold"
+              onClick={() => handleSort("slot")}
+            >
+              Slot {sortField === "slot" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer text-white font-semibold"
+              onClick={() => handleSort("isBooked")}
+            >
+              Booked? {sortField === "isBooked" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+            </TableHead>
+            <TableHead className="text-center text-white font-semibold">
+              Action
+            </TableHead>
+          </TableRow>
+        </TableHeader>
 
+        <TableBody>
           {paginatedSlots.length > 0 ? (
-            <Table className="min-w-[600px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-center cursor-pointer" onClick={() => handleSort("slot")}>
-                    Slot {sortField === "slot" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
-                  </TableHead>
-                  <TableHead className="text-center cursor-pointer" onClick={() => handleSort("isBooked")}>
-                    Booked? {sortField === "isBooked" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
-                  </TableHead>
-                  <TableHead className="text-center">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedSlots.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="text-center">{s.slot}</TableCell>
-                    <TableCell className="text-center">{s.isBooked ? "Yes" : "No"}</TableCell>
-                    <TableCell className="text-center">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteSlot(s.id, s.service_id, s.date)}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            paginatedSlots.map((s) => (
+              <TableRow
+                key={s.id}
+                className="hover:bg-gray-50 transition-colors border-b border-gray-100"
+              >
+                <TableCell className="text-center">{s.slot}</TableCell>
+                <TableCell className="text-center">
+                  {s.isBooked ? "Yes" : "No"}
+                </TableCell>
+                <TableCell className="text-center">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="rounded-md px-3 py-1 hover:opacity-90"
+                    onClick={() =>
+                      handleDeleteSlot(s.id, s.service_id, s.date)
+                    }
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
           ) : (
-            <div className="text-center py-4 text-gray-500 font-medium">
-              No slots found
-            </div>
+            <TableRow>
+              <TableCell
+                colSpan={3}
+                className="text-center text-gray-500 py-4 font-medium"
+              >
+                No slots found
+              </TableCell>
+            </TableRow>
           )}
+        </TableBody>
+      </Table>
+    </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center mt-4 gap-2">
-              <Button
-                size="sm"
-                disabled={page === 1}
-                onClick={() => setPage(p => p - 1)}
-              >
-                Prev
-              </Button>
-              <span>{page} / {totalPages}</span>
-              <Button
-                size="sm"
-                disabled={page === totalPages}
-                onClick={() => setPage(p => p + 1)}
-              >
-                Next
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+    {/* Pagination */}
+    {totalPages > 1 && (
+      <div className="flex justify-center items-center mt-4 gap-2">
+        <Button
+          size="sm"
+          disabled={page === 1}
+          onClick={() => setPage((p) => p - 1)}
+        >
+          Prev
+        </Button>
+        <span>
+          {page} / {totalPages}
+        </span>
+        <Button
+          size="sm"
+          disabled={page === totalPages}
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next
+        </Button>
+      </div>
+    )}
+  </CardContent>
+</Card>
+
 
     </div>
   );
@@ -391,7 +420,7 @@ export default AdminSlotManagement;
 
 //   return (
 //     <div className="max-w-4xl mx-auto p-4">
-//       <Card className="shadow-lg">
+//       <Card className="shadow-md">
 //         <CardHeader>
 //           <CardTitle>Admin Slot Management</CardTitle>
 //         </CardHeader>

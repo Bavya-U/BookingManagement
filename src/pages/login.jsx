@@ -22,8 +22,8 @@ const Login = () => {
   const initialValues = { email: "", password: "" };
 
   const validationSchema = Yup.object({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().required("Password is required"),
+    email: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string().required("Required"),
   });
 
   const handleSubmit = (values, { setSubmitting }) => {
@@ -102,7 +102,7 @@ const Login = () => {
                         className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <FaEye /> : <FaEyeSlash />}
+                        {showPassword ?<FaEyeSlash />  : <FaEye />}
                       </span>
                     </div>
                     <ErrorMessage
@@ -113,7 +113,7 @@ const Login = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-[#2798b5] hover:bg-[#1f7a91] text-white"
+                    className="w-full bg-[#2798b5] rounded hover:bg-[#35a7c7] text-white hover:scale-105 transition"
                     disabled={loading || isSubmitting}
                   >
                     {loading ? "Logging in..." : "Login"}

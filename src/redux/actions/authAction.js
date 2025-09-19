@@ -14,7 +14,7 @@ export const signupUser = (email, password, role) => async (dispatch) => {
     await setDoc(doc(db, "users", user.uid), { email: user.email, role });
 
     dispatch({ type: "SIGNUP_SUCCESS", payload: { uid: user.uid, email: user.email, role } });
-    toast.success("Signup successful!S");
+    toast.success("Signup successful!");
   } catch (error) {
     dispatch({ type: "SIGNUP_FAILURE", payload: error.message });
     toast.error(error.message); // ❌ error toast

@@ -21,9 +21,11 @@ import BookingConfirmation from "./pages/resident/bookingConfirmation";
 import AdminSlotManagement from "./pages/admin/adminSlotManagement";
 import AdminServiceManagement from "./pages/admin/adminServiceManagement";
 import AdminAllBookings from "./pages/admin/allBooking";
+import { Loader } from "./components/loader";
 function App() {
   return (
     <Router>
+      <Loader />
       <Routes>
         <Route path="/" element={<Signup />} />
         <Route path="/login" element={<Login />} />
