@@ -1,3 +1,4 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signup from "./pages/signup";
 import Login from "./pages/login";
@@ -17,14 +18,26 @@ import AdminSlotManagement from "./pages/admin/adminSlotManagement";
 import AdminServiceManagement from "./pages/admin/adminServiceManagement";
 import AdminAllBookings from "./pages/admin/allBooking";
 import { Loader } from "./components/loader";
+import PrivateRoute from "./components/PrivateRoute";
+
 function App() {
   return (
     <Router>
       <Loader />
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/resident-dashboard" element={<Layout />}>
+
+        {/* Resident Dashboard - Protected */}
+        <Route
+          path="/resident-dashboard"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
           <Route index element={<ResidentDashboard />} />
           <Route path="resident-booking" element={<ResidentBooking />} />
           <Route path="resident-my-bookings" element={<ResidentMyBookings />} />
@@ -33,19 +46,23 @@ function App() {
             element={<BookingConfirmation />}
           />
         </Route>
-        <Route path="/admin-dashboard" element={<Layout />}>
+
+        {/* Admin Dashboard - Protected */}
+        <Route
+          path="/admin-dashboard"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
           <Route index element={<AdminDashboard />} />
-          <Route
-            path="admin-slot-management"
-            element={<AdminSlotManagement />}
-          />
-          <Route
-            path="admin-service-management"
-            element={<AdminServiceManagement />}
-          />
+          <Route path="admin-slot-management" element={<AdminSlotManagement />} />
+          <Route path="admin-service-management" element={<AdminServiceManagement />} />
           <Route path="admin-bookings" element={<AdminAllBookings />} />
         </Route>
       </Routes>
+
       <ToastContainer position="top-right" />
     </Router>
   );
