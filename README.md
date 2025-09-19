@@ -59,7 +59,7 @@ A web application for managing bookings where residents can register, log in, se
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/booking-management-system.git
+   git clone https://github.com/Bavya-U/BookingManagement.git
    cd booking-management-system
 2. **Install dependencies:**
      npm install
