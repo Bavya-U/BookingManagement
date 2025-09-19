@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom"; 
+import { useNavigate, useLocation } from "react-router-dom";
 import { logout } from "../redux/actions/authAction";
 import logo from "../assets/logo.png";
 import { Menu } from "lucide-react";
 import { FiUser } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
   const { user } = useSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -18,15 +19,14 @@ function Navbar() {
     dispatch(logout());
     navigate("/login");
     setUserMenuOpen(false);
+    toast.success("Logout successful!");
   };
 
-  // helper for active tab check
   const isActive = (path) =>
     location.pathname === path
-          ? "bg-white/40 px-2 py-1 rounded-md font-semibold" // 👈 opacity bg
-    : "hover:bg-white/20 px-2 py-1 rounded-md"; 
+      ? "bg-white/40 px-2 py-1 rounded-md font-semibold"
+      : "hover:bg-white/20 px-2 py-1 rounded-md";
 
-  // Role-based menu items
   const renderMenuItems = () => {
     if (user?.role === "Resident") {
       return (
@@ -52,7 +52,6 @@ function Navbar() {
     } else if (user?.role === "Admin") {
       return (
         <>
-          
           <span
             className={`text-sm cursor-pointer ${isActive(
               "/admin-dashboard/admin-service-management"
@@ -88,7 +87,6 @@ function Navbar() {
   return (
     <nav className="bg-[#2798b5] text-white shadow-md">
       <div className="container mx-auto flex items-center justify-between px-2">
-        {/* Logo */}
         <img
           src={logo}
           alt="Logo"
@@ -96,11 +94,9 @@ function Navbar() {
           onClick={() => navigate("/")}
         />
 
-        {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">
           {renderMenuItems()}
 
-          {/* User Icon Dropdown */}
           <div className="relative">
             <FiUser
               className="h-6 w-6 cursor-pointer"
@@ -108,15 +104,15 @@ function Navbar() {
             />
             {userMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg p-3 space-y-2 z-50">
-              <div className="text-sm flex font-semibold">
-  Email:
-  <span className="text-sm font-light ml-2">{user?.email}</span>
-</div>
+                <div className="text-sm flex font-semibold">
+                  Email:
+                  <span className="text-sm font-light ml-2">{user?.email}</span>
+                </div>
 
-<div className="text-sm flex font-semibold">
-  Role:
-  <span className="text-sm font-light ml-2">{user?.role}</span>
-</div>
+                <div className="text-sm flex font-semibold">
+                  Role:
+                  <span className="text-sm font-light ml-2">{user?.role}</span>
+                </div>
 
                 <button
                   onClick={handleLogout}
@@ -129,7 +125,6 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           className="md:hidden"
           onClick={() => setIsOpen(!isOpen)}
@@ -139,12 +134,10 @@ function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Dropdown */}
       {isOpen && (
         <div className="md:hidden bg-[#2798b5] text-white p-4 space-y-3">
           {renderMenuItems()}
 
-          {/* Mobile User Dropdown */}
           <div className="relative">
             <div
               className="flex items-center gap-2 cursor-pointer"
@@ -154,15 +147,15 @@ function Navbar() {
             </div>
             {userMenuOpen && (
               <div className="mt-2 bg-white text-black rounded shadow-lg p-3 space-y-2">
-                            <div className="text-sm flex font-semibold">
-  Email:
-  <span className="text-sm font-light ml-2">{user?.email}</span>
-</div>
+                <div className="text-sm flex font-semibold">
+                  Email:
+                  <span className="text-sm font-light ml-2">{user?.email}</span>
+                </div>
 
-<div className="text-sm flex font-semibold">
-  Role:
-  <span className="text-sm font-light ml-2">{user?.role}</span>
-</div>
+                <div className="text-sm flex font-semibold">
+                  Role:
+                  <span className="text-sm font-light ml-2">{user?.role}</span>
+                </div>
                 <button
                   onClick={handleLogout}
                   className="w-full text-left text-sm text-red-600 hover:text-red-800"
@@ -179,4 +172,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

@@ -5,12 +5,10 @@ import { auth } from "../../firebase";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBookingById } from "../../redux/actions/bookingAction";
 
-// ✅ ShadCN UI
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// ✅ Icons
 import { CheckCircle, Copy, Printer } from "lucide-react";
 
 const BookingConfirmation = () => {
@@ -24,7 +22,6 @@ const BookingConfirmation = () => {
 
   const [user, setUser] = useState(null);
 
-  // ✅ Protect page
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       if (!u) {
@@ -36,7 +33,6 @@ const BookingConfirmation = () => {
     return () => unsub();
   }, [navigate]);
 
-  // ✅ Fetch booking from Redux
   useEffect(() => {
     if (bookingId) {
       dispatch(fetchBookingById(bookingId));
@@ -86,7 +82,6 @@ const BookingConfirmation = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Booking ID */}
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Badge
               variant="secondary"
@@ -102,33 +97,6 @@ const BookingConfirmation = () => {
             </Button>
           </div>
 
-          {/* Booking Details */}
-          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm md:text-base ">
-            <div className="bg-gray-50 rounded-lg">
-              <p className="font-semibold text-gray-600">Name</p>
-              <p className="text-gray-800">{booking.customerName || "—"}</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg">
-              <p className="font-semibold text-gray-600">Email</p>
-              <p className="text-gray-800">{booking.email || "—"}</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg">
-              <p className="font-semibold text-gray-600">Phone</p>
-              <p className="text-gray-800">{booking.phone || "—"}</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg">
-              <p className="font-semibold text-gray-600">Service</p>
-              <p className="text-gray-800">{serviceName || booking.service_id}</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg">
-              <p className="font-semibold text-gray-600">Date</p>
-              <p className="text-gray-800">{booking.date}</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg">
-              <p className="font-semibold text-gray-600">Time Slot</p>
-              <p className="text-gray-800">{booking.slot}</p>
-            </div>
-          </div> */}
 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm md:text-base">
   <div className="bg-gray-50 rounded-lg p-3 flex flex-col items-center justify-center text-center">
     <p className="font-semibold text-gray-600">Name</p>
@@ -156,7 +124,6 @@ const BookingConfirmation = () => {
   </div>
 </div>
 
-          {/* Go Back */}
           <div className="pt-2 flex justify-center">
             <Button
               onClick={() => navigate("/resident-dashboard/resident-booking")}

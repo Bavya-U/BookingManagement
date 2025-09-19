@@ -1,4 +1,4 @@
-// src/redux/actions/bookingActions.js
+import { toast } from "react-toastify";
 import { db, auth } from "../../firebase";
 import { collection, getDocs, addDoc, query, where, doc, setDoc ,getDoc,deleteDoc,} from "firebase/firestore";
 
@@ -66,9 +66,11 @@ export const addBooking = ({ serviceId, date, slot, name, email, phone }, naviga
     }
 
     dispatch({ type: ADD_BOOKING, payload: docRef.id });
+    toast.success("Service booked successful!");
     navigate(`/resident-dashboard/booking-confirmation/${docRef.id}`);
   } catch (error) {
     dispatch({ type: BOOKING_ERROR, payload: error.message });
+    toast.error(error.message);
   }
 };
 
@@ -91,8 +93,10 @@ export const fetchBookings = (userId) => async (dispatch) => {
     );
 
     dispatch({ type: FETCH_BOOKINGS_SUCCESS, payload: data });
+    toast.success("Booking fetched successful!");
   } catch (err) {
     dispatch({ type: FETCH_BOOKINGS_FAIL, payload: err.message });
+    toast.error(err.message);
   }
 };
 
@@ -101,8 +105,10 @@ export const cancelBooking = (id) => async (dispatch) => {
   try {
     await deleteDoc(doc(db, "bookings", id));
     dispatch({ type: CANCEL_BOOKING_SUCCESS, payload: id });
+    toast.success("Booking deleted successful!");
   } catch (err) {
     dispatch({ type: CANCEL_BOOKING_FAIL, payload: err.message });
+    toast.error(err.message);
   }
 };
 export const fetchBookingById = (bookingId) => async (dispatch) => {

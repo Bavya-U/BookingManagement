@@ -23,7 +23,7 @@ export default function slotReducer(state = initialState, action) {
       return { ...state, loading: false, error: action.payload };
     case ADD_SLOT_SUCCESS:
     case DELETE_SLOT_SUCCESS:
-      return state; // we refetch after add/delete
+      return state; 
     default:
       return state;
   }

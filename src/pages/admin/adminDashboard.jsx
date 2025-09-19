@@ -25,7 +25,9 @@ const AdminDashboard = () => {
 
             <Button
               className="w-full"
-              onClick={() => navigate("/admin-dashboard/admin-service-management")}
+              onClick={() =>
+                navigate("/admin-dashboard/admin-service-management")
+              }
               variant="secondary"
             >
               Manage Services

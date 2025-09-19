@@ -17,7 +17,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; 
+import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
 
 const ResidentMyBookings = () => {
@@ -33,7 +33,6 @@ const ResidentMyBookings = () => {
     (state) => state.booking || {}
   );
 
-  // Watch auth state
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -50,7 +49,6 @@ const ResidentMyBookings = () => {
     }
   };
 
-  // ✅ Filter bookings
   const filteredBookings = booking.filter(
     (b) =>
       b.customerName.toLowerCase().includes(search.toLowerCase()) ||
@@ -61,18 +59,15 @@ const ResidentMyBookings = () => {
       b.slot.toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ Sort bookings dynamically
   const sortedBookings = [...filteredBookings].sort((a, b) => {
     let valA = a[sortColumn] || "";
     let valB = b[sortColumn] || "";
 
-    // Date handling
     if (sortColumn === "date") {
       valA = new Date(valA);
       valB = new Date(valB);
     }
 
-    // String/Number handling
     if (typeof valA === "string") valA = valA.toLowerCase();
     if (typeof valB === "string") valB = valB.toLowerCase();
 
@@ -81,7 +76,6 @@ const ResidentMyBookings = () => {
     return 0;
   });
 
-  // ✅ Pagination logic
   const totalPages = Math.ceil(sortedBookings.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const currentBookings = sortedBookings.slice(
@@ -89,7 +83,6 @@ const ResidentMyBookings = () => {
     startIndex + rowsPerPage
   );
 
-  // ✅ Handle column sort click
   const handleSort = (column) => {
     if (sortColumn === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -130,7 +123,9 @@ const ResidentMyBookings = () => {
         <CardContent>
           {currentBookings?.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-gray-500 text-lg">No matching bookings found.</p>
+              <p className="text-gray-500 text-lg">
+                No matching bookings found.
+              </p>
             </div>
           ) : (
             <>

@@ -7,7 +7,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { loginUser } from "../redux/actions/authAction";
 import logo from "../assets/logo.png";
 
-// ShadCN UI components
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,21 +31,19 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (user?.role === "Admin") navigate("/admin-dashboard/admin-service-management");
-    if (user?.role === "Resident") navigate("/resident-dashboard/resident-booking");
+    if (user?.role === "Admin")
+      navigate("/admin-dashboard/admin-service-management");
+    if (user?.role === "Resident")
+      navigate("/resident-dashboard/resident-booking");
   }, [user, navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      {/* Main Card with Flex Row */}
       <Card className="w-full max-w-3xl shadow-xl rounded-2xl overflow-hidden flex flex-row p-0">
-        {/* Left Gradient Section (Hidden on mobile) */}
         <div className="hidden md:flex w-1/2 bg-gradient-to-r from-[#2798b5] to-[#6ed7ec] text-white flex-col justify-center px-15">
           <img src={logo} alt="Logo" className="w-45 cursor-pointer" />
           <h2 className="text-4xl font-bold mb-4">Welcome Back!</h2>
         </div>
-
-        {/* Right Login Section */}
         <div className="w-full md:w-1/2 bg-white flex items-center justify-center p-5">
           <CardContent className="w-full p-0">
             <h2 className="text-3xl font-bold text-center mb-6">Login</h2>
@@ -58,7 +55,6 @@ const Login = () => {
             >
               {({ isSubmitting, errors, touched }) => (
                 <Form className="space-y-4">
-                  {/* Email */}
                   <div>
                     <Label htmlFor="email">
                       Email Address <span className="text-red-500">*</span>
@@ -80,7 +76,6 @@ const Login = () => {
                     />
                   </div>
 
-                  {/* Password */}
                   <div>
                     <Label htmlFor="password">
                       Password <span className="text-red-500">*</span>{" "}
@@ -102,7 +97,7 @@ const Login = () => {
                         className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ?<FaEyeSlash />  : <FaEye />}
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
                       </span>
                     </div>
                     <ErrorMessage
@@ -122,7 +117,6 @@ const Login = () => {
               )}
             </Formik>
 
-            {/* Sign Up Link */}
             <p className="text-center mt-4 text-gray-600">
               Don&apos;t have an account?{" "}
               <span

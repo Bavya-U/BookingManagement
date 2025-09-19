@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBookings, cancelBooking } from "../../redux/actions/allBookingAction";
+import {
+  fetchBookings,
+  cancelBooking,
+} from "../../redux/actions/allBookingAction";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
+import {
+  Table,
+  TableHeader,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
@@ -29,7 +39,6 @@ const AdminAllBookings = () => {
     }
   };
 
-  // Filter, sort, paginate (same as your previous logic)
   const filteredBookings = bookings.filter(
     (b) =>
       (b.customerName || "").toLowerCase().includes(search.toLowerCase()) ||
@@ -55,7 +64,10 @@ const AdminAllBookings = () => {
 
   const totalPages = Math.ceil(sortedBookings.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentBookings = sortedBookings.slice(startIndex, startIndex + rowsPerPage);
+  const currentBookings = sortedBookings.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -88,9 +100,7 @@ const AdminAllBookings = () => {
         </CardHeader>
         <CardContent className="overflow-x-auto">
           {currentBookings.length === 0 ? (
-            <p className="text-center py-4 text-gray-500">
-              No bookings found.
-            </p>
+            <p className="text-center py-4 text-gray-500">No bookings found.</p>
           ) : (
             <>
               <Table className="min-w-full">
@@ -131,7 +141,9 @@ const AdminAllBookings = () => {
                       Slot
                       <ArrowUpDown className="inline w-4 h-4 ml-1 text-gray-400" />
                     </TableHead>
-                    <TableHead className="px-4 py-3 text-center">Action</TableHead>
+                    <TableHead className="px-4 py-3 text-center">
+                      Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -142,9 +154,13 @@ const AdminAllBookings = () => {
                         idx % 2 === 0 ? "bg-white" : "bg-gray-50"
                       } hover:bg-gray-100 transition`}
                     >
-                      <TableCell className="px-4 py-3">{b.customerName}</TableCell>
+                      <TableCell className="px-4 py-3">
+                        {b.customerName}
+                      </TableCell>
                       <TableCell className="px-4 py-3">{b.email}</TableCell>
-                      <TableCell className="px-4 py-3">{b.serviceName || b.service_id}</TableCell>
+                      <TableCell className="px-4 py-3">
+                        {b.serviceName || b.service_id}
+                      </TableCell>
                       <TableCell className="px-4 py-3">{b.date}</TableCell>
                       <TableCell className="px-4 py-3">{b.slot}</TableCell>
                       <TableCell className="px-4 py-3 text-center">
@@ -162,7 +178,6 @@ const AdminAllBookings = () => {
                 </TableBody>
               </Table>
 
-              {/* Pagination */}
               <div className="flex items-center justify-between mt-4">
                 <Button
                   variant="outline"
@@ -180,7 +195,9 @@ const AdminAllBookings = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(p + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                 >
                   Next <ChevronRight className="w-4 h-4 ml-1" />

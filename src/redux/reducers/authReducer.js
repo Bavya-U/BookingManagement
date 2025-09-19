@@ -1,5 +1,4 @@
 const initialState = {
-  // user: null,
   loading: false,
   error: null,
   user: JSON.parse(localStorage.getItem("user")) || null,
@@ -21,7 +20,7 @@ const authReducer = (state = initialState, action) => {
       return { ...state, loading: false, error: action.payload };
 
     case "LOGOUT":
-        localStorage.removeItem("user"); // clear
+        localStorage.removeItem("user"); 
       return { ...state, user: null };
 
     case "SIGNUP_RESET":

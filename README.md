@@ -55,13 +55,3 @@ A web application for managing bookings where residents can register, log in, se
   - **Firebase Firestore** (Database)
 
 ---
-
-## Firebase Collections
-
-### services
-```json
-{
-  "id": "string",
-  "name": "string",
-  "description": "string"
-}

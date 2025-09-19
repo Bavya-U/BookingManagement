@@ -17,7 +17,7 @@ export const signupUser = (email, password, role) => async (dispatch) => {
     toast.success("Signup successful!");
   } catch (error) {
     dispatch({ type: "SIGNUP_FAILURE", payload: error.message });
-    toast.error(error.message); // ❌ error toast
+    toast.error(error.message); 
   }
 };
 
