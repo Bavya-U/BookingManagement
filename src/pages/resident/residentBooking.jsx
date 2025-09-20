@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { format } from "date-fns";
-import { useFormik } from "formik";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,14 @@ import {
   addBooking,
 } from "@/redux/actions/bookingAction";
 
+const formatDateToLocal = (date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const ResidentBooking = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -40,40 +49,51 @@ const ResidentBooking = () => {
     dispatch(fetchServices());
   }, [dispatch]);
 
-  const formik = useFormik({
-    initialValues: {
+  const schema = Yup.object().shape({
+    serviceId: Yup.string().required("Required"),
+    date: Yup.date().required("Required").nullable(),
+    slot: Yup.string().required("Required"),
+    name: Yup.string().required("Required"),
+    email: Yup.string().email("Invalid email").required("Required"),
+    phone: Yup.string()
+      .matches(/^[0-9]{10}$/, "Phone must be 10 digits")
+      .required("Required"),
+  });
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
       serviceId: "",
       date: new Date(),
       slot: "",
       name: "",
-      email: user?.email,
+      email: user?.email || "",
       phone: "",
     },
-    validationSchema: Yup.object({
-      serviceId: Yup.string().required("Required"),
-      date: Yup.date().required("Required").nullable(),
-      slot: Yup.string().required("Required"),
-      name: Yup.string().required("Required"),
-      email: Yup.string().email("Invalid email").required("Required"),
-      phone: Yup.string()
-        .matches(/^[0-9]{10}$/, "Phone must be 10 digits")
-        .required("Required"),
-    }),
-    onSubmit: (values) => {
-      const bookingData = {
-        ...values,
-        date: values.date.toISOString().split("T")[0],
-      };
-      dispatch(addBooking(bookingData, navigate));
-    },
+    resolver: yupResolver(schema),
   });
 
+  const watchService = watch("serviceId");
+  const watchDate = watch("date");
+
   useEffect(() => {
-    if (formik.values.serviceId && formik.values.date) {
-      const formattedDate = formik.values.date.toISOString().split("T")[0];
-      dispatch(fetchSlots(formik.values.serviceId, formattedDate));
+    if (watchService && watchDate) {
+      dispatch(fetchSlots(watchService, formatDateToLocal(watchDate)));
     }
-  }, [dispatch, formik.values.serviceId, formik.values.date]);
+  }, [dispatch, watchService, watchDate]);
+
+  const onSubmit = (data) => {
+    const bookingData = {
+      ...data,
+      date: formatDateToLocal(data.date),
+    };
+    dispatch(addBooking(bookingData, navigate));
+  };
 
   return (
     <div
@@ -103,32 +123,33 @@ const ResidentBooking = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={formik.handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label>
                       Service <span className="text-red-500">*</span>
                     </Label>
-                    <Select
-                      value={formik.values.serviceId}
-                      onValueChange={(val) =>
-                        formik.setFieldValue("serviceId", val)
-                      }
-                    >
-                      <SelectTrigger className="w-full bg-white rounded">
-                        <SelectValue placeholder="Select Service" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {services.map((s) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.name || "No Name"}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {formik.touched.serviceId && formik.errors.serviceId && (
-                      <p className="text-red-500 text-sm">
-                        {formik.errors.serviceId}
+                    <Controller
+                      name="serviceId"
+                      control={control}
+                      render={({ field }) => (
+                        <Select {...field} onValueChange={field.onChange}>
+                          <SelectTrigger className="w-full bg-white rounded">
+                            <SelectValue placeholder="Select Service" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {services.map((s) => (
+                              <SelectItem key={s.id} value={s.id}>
+                                {s.name || "No Name"}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.serviceId && (
+                      <p className="text-red-500 text-sm p-0 m-0">
+                        {errors.serviceId.message}
                       </p>
                     )}
                   </div>
@@ -137,56 +158,70 @@ const ResidentBooking = () => {
                     <Label>
                       Date <span className="text-red-500">*</span>
                     </Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal rounded bg-white"
-                        >
-                          {formik.values.date
-                            ? format(formik.values.date, "PPP")
-                            : "Pick a date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={formik.values.date}
-                          onSelect={(val) => formik.setFieldValue("date", val)}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <Controller
+                      name="date"
+                      control={control}
+                      render={({ field }) => (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start text-left font-normal rounded bg-white"
+                            >
+                              {field.value
+                                ? format(field.value, "PPP")
+                                : "Pick a date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={(val) => field.onChange(val)}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      )}
+                    />
+                    {errors.date && (
+                      <p className="text-red-500 text-sm p-0 m-0">
+                        {errors.date.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
                     <Label>
                       Time Slot <span className="text-red-500">*</span>
                     </Label>
-                    <Select
-                      value={formik.values.slot}
-                      onValueChange={(val) => formik.setFieldValue("slot", val)}
-                    >
-                      <SelectTrigger className="w-full bg-white rounded">
-                        <SelectValue placeholder="Select Time Slot" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {slots.length > 0 ? (
-                          slots.map((slot) => (
-                            <SelectItem key={slot.id} value={slot.slot}>
-                              {slot.slot}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-slots" disabled>
-                            No slots available
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    {formik.touched.slot && formik.errors.slot && (
-                      <p className="text-red-500 text-sm">
-                        {formik.errors.slot}
+                    <Controller
+                      name="slot"
+                      control={control}
+                      render={({ field }) => (
+                        <Select {...field} onValueChange={field.onChange}>
+                          <SelectTrigger className="w-full bg-white rounded">
+                            <SelectValue placeholder="Select Time Slot" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {slots.length > 0 ? (
+                              slots.map((slot) => (
+                                <SelectItem key={slot.id} value={slot.slot}>
+                                  {slot.slot}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="no-slots" disabled>
+                                No slots available
+                              </SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.slot && (
+                      <p className="text-red-500 text-sm p-0 m-0">
+                        {errors.slot.message}
                       </p>
                     )}
                   </div>
@@ -195,18 +230,20 @@ const ResidentBooking = () => {
                     <Label>
                       Your Name <span className="text-red-500">*</span>
                     </Label>
-                    <Input
-                      type="text"
+                    <Controller
                       name="name"
-                      value={formik.values.name}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="bg-white rounded"
-                      placeholder="Enter Your Name"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Enter Your Name"
+                          className="bg-white rounded"
+                        />
+                      )}
                     />
-                    {formik.touched.name && formik.errors.name && (
-                      <p className="text-red-500 text-sm">
-                        {formik.errors.name}
+                    {errors.name && (
+                      <p className="text-red-500 text-sm p-0 m-0">
+                        {errors.name.message}
                       </p>
                     )}
                   </div>
@@ -215,18 +252,20 @@ const ResidentBooking = () => {
                     <Label>
                       Email <span className="text-red-500">*</span>
                     </Label>
-                    <Input
-                      type="email"
+                    <Controller
                       name="email"
-                      value={formik.values.email}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="bg-white rounded"
-                      placeholder="Enter Your Email"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Enter Your Email"
+                          className="bg-white rounded"
+                        />
+                      )}
                     />
-                    {formik.touched.email && formik.errors.email && (
-                      <p className="text-red-500 text-sm">
-                        {formik.errors.email}
+                    {errors.email && (
+                      <p className="text-red-500 text-sm p-0 m-0">
+                        {errors.email.message}
                       </p>
                     )}
                   </div>
@@ -235,18 +274,20 @@ const ResidentBooking = () => {
                     <Label>
                       Phone <span className="text-red-500">*</span>
                     </Label>
-                    <Input
-                      type="text"
+                    <Controller
                       name="phone"
-                      value={formik.values.phone}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="bg-white rounded"
-                      placeholder="Enter Your Phone"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Enter Your Phone"
+                          className="bg-white rounded"
+                        />
+                      )}
                     />
-                    {formik.touched.phone && formik.errors.phone && (
-                      <p className="text-red-500 text-sm">
-                        {formik.errors.phone}
+                    {errors.phone && (
+                      <p className="text-red-500 text-sm  p-0 m-0">
+                        {errors.phone.message}
                       </p>
                     )}
                   </div>

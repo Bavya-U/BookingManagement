@@ -6,7 +6,8 @@ import {
   deleteService,
 } from "../../redux/actions/serviceAction";
 
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -22,6 +23,12 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
+// Yup validation schema
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("Required"),
+  description: Yup.string(),
+});
+
 const AdminServiceManagement = () => {
   const dispatch = useDispatch();
   const { list: services, loading } = useSelector((state) => state.services);
@@ -30,65 +37,62 @@ const AdminServiceManagement = () => {
     dispatch(fetchServices());
   }, [dispatch]);
 
-  const validationSchema = Yup.object({
-    name: Yup.string().required("Required"),
-    description: Yup.string(),
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: { name: "", description: "" },
   });
+
+  const onSubmit = (data) => {
+    dispatch(addService(data.name, data.description));
+    reset(); // Reset the form after submit
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-4">
       <Card className="shadow-md">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Service Management
-          </CardTitle>
+          <CardTitle className="text-xl font-semibold">Service Management</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Formik
-            initialValues={{ name: "", description: "" }}
-            validationSchema={validationSchema}
-            onSubmit={(values, { resetForm }) => {
-              dispatch(addService(values.name, values.description));
-              resetForm();
-            }}
-          >
-            <Form className="grid gap-4">
-              <div>
-                <label className="block mb-1 font-medium">
-                  Service Name <span className="text-red-500">*</span>
-                </label>
-                <Field
-                  as={Input}
-                  name="name"
-                  placeholder="Enter service name"
-                />
-                <ErrorMessage
-                  name="name"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-medium">Description</label>
-                <Field
-                  as={Textarea}
-                  name="description"
-                  placeholder="Enter description"
-                />
-                <ErrorMessage
-                  name="description"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full md:w-auto bg-[#2798b5] rounded hover:bg-[#35a7c7] text-white mb-4 hover:scale-105 transition"
-              >
-                Add Service
-              </Button>
-            </Form>
-          </Formik>
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+            <div>
+              <label className="block mb-1 font-medium">
+                Service Name <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="text"
+                placeholder="Enter service name"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1 mb-0 p-0">{errors.name.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block mb-1 font-medium">Description</label>
+              <Textarea
+                placeholder="Enter description"
+                {...register("description")}
+              />
+              {errors.description && (
+                <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full md:w-auto bg-[#2798b5] rounded hover:bg-[#35a7c7] text-white mb-4 hover:scale-105 transition"
+            >
+              Add Service
+            </Button>
+          </form>
 
           <h3 className="text-lg font-medium pt-4">Existing Services</h3>
           <div className="overflow-x-auto">
@@ -118,9 +122,7 @@ const AdminServiceManagement = () => {
                           key={s.id}
                           className="hover:bg-gray-50 transition-colors border-b border-gray-100"
                         >
-                          <TableCell className="font-medium">
-                            {s.name}
-                          </TableCell>
+                          <TableCell className="font-medium">{s.name}</TableCell>
                           <TableCell className="text-gray-600">
                             {s.description || "No description"}
                           </TableCell>

@@ -119,13 +119,27 @@ const AdminSlotManagement = () => {
     (page - 1) * pageSize,
     page * pageSize
   );
+  const generateSlots = () => {
+    const slots = [];
+    for (let hour = 9; hour < 21; hour++) {
+      const startHour = hour;
+      const endHour = hour + 1;
+      const formatHour = (h) => {
+        const ampm = h >= 12 ? "PM" : "AM";
+        const hour12 = h % 12 || 12;
+        return `${hour12}:00 ${ampm}`;
+      };
+      slots.push(`${formatHour(startHour)} - ${formatHour(endHour)}`);
+    }
+    return slots;
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-4 space-y-6">
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">
-            Service Management
+            Slot Management
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -217,7 +231,7 @@ const AdminSlotManagement = () => {
                       </div>
                     </div>
 
-                    <div className="flex-1 flex flex-col w-full">
+                    {/* <div className="flex-1 flex flex-col w-full">
                       <label>
                         Slot <span className="text-red-500">*</span>
                       </label>
@@ -266,6 +280,35 @@ const AdminSlotManagement = () => {
                           )}
                         </Field>
                       </div>
+                      <div className="h-5 text-red-500 text-sm">
+                        <ErrorMessage name="slot" />
+                      </div>
+                    </div> */}
+                    <div className="flex-1 flex flex-col w-full">
+                      <label>
+                        Slot <span className="text-red-500">*</span>
+                      </label>
+                      <Field name="slot">
+                        {({ field, form }) => (
+                          <Select
+                            value={field.value || undefined}
+                            onValueChange={(val) =>
+                              form.setFieldValue("slot", val)
+                            }
+                          >
+                            <SelectTrigger className="w-full h-10 rounded px-3">
+                              <SelectValue placeholder="Select Slot" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {generateSlots().map((slot, idx) => (
+                                <SelectItem key={idx} value={slot}>
+                                  {slot}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </Field>
                       <div className="h-5 text-red-500 text-sm">
                         <ErrorMessage name="slot" />
                       </div>
@@ -345,7 +388,7 @@ const AdminSlotManagement = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          className="rounded-md px-3 py-1 hover:opacity-90"
+                          className="rounded px-3 py-1 hover:opacity-90"
                           onClick={() =>
                             handleDeleteSlot(s.id, s.service_id, s.date)
                           }

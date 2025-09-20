@@ -31,6 +31,7 @@ export const fetchServices = () => async (dispatch) => {
 // Fetch slots
 export const fetchSlots = (serviceId, date) => async (dispatch) => {
   try {
+    console.log(date)
     const q = query(
       collection(db, "time_slots"),
       where("service_id", "==", serviceId),

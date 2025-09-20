@@ -87,12 +87,22 @@ function Navbar() {
   return (
     <nav className="bg-[#2798b5] text-white shadow-md">
       <div className="container mx-auto flex items-center justify-between px-2">
-        <img
-          src={logo}
-          alt="Logo"
-          className="w-36 h-15 cursor-pointer"
-          onClick={() => navigate("/")}
-        />
+       <img
+  src={logo}
+  alt="Logo"
+  className="w-36 h-15 cursor-pointer"
+  onClick={() => {
+    if (!user) {
+      // Only redirect to login/signup if not logged in
+      navigate("/");
+    } else if (user.role === "Resident") {
+      navigate("/resident-dashboard/resident-booking");
+    } else if (user.role === "Admin") {
+      navigate("/admin-dashboard/admin-service-management");
+    }
+  }}
+/>
+
 
         <div className="hidden md:flex items-center gap-6">
           {renderMenuItems()}
